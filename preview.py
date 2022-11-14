@@ -1,23 +1,30 @@
 import tkinter as tk
 from tkinter import ttk
 
+import argparse
 import os
 import shutil
-import sys
 from tkinter import *
-from tkinter import filedialog
 from PIL import Image, ImageTk
-import cv2
-import csv
 import json
 import ndjson
 import matplotlib.patches as patches
 import matplotlib.pyplot as plt
 
 
+def parse_args():
+    parser = argparse.ArgumentParser(description='analyze annotation of pedestrian')
+    parser.add_argument('ann_json', help='ex) ann_records/nuimages_ped_1017_v1.0-train.json')
+    parser.add_argument('img_root', help='ex) img_ped/nuimages_ped/v1.0-train/img')
+    parser.add_argument('save_dir', help='ex) ./output')
+    _args = parser.parse_args()
+    return _args
+
+
 class Cell:
     def __init__(self, value):
-        self.value = value
+        self.token = value[0]
+        self.value = value[1]
         self.next = None
         self.prev = None
 
@@ -43,7 +50,7 @@ class DoublyLinkedList:
 
 
 class Application(tk.Frame):
-    def __init__(self, master, ann_json: str, img_root: str):
+    def __init__(self, master, ann_json: str, img_root: str, save_dir: str):
         super().__init__(master)
         self.pack()
 
@@ -52,10 +59,14 @@ class Application(tk.Frame):
         self.img_width = 1600
         self.img_height = 900
 
+        self.save_dir = save_dir
+        self.create_save_dir()
+        self.exported = []
+
         _tmp_records = self.read_json(ann_json)
         self.records = DoublyLinkedList()
         for _tmp_record in _tmp_records:
-            self.records.insert(_tmp_record[1])
+            self.records.insert(_tmp_record)
 
         self.img_root = img_root
         self.create_widgets()
@@ -170,7 +181,7 @@ class Application(tk.Frame):
     def drawImage(self):
         _img_path = self.img_root + '/' + self.imagetoken + '.jpg'
         self.render_check_image(_img_path, self.record.value['bbox'], self.ann_coords, self.ann_eyecontacts, self.ann_difficult)
-        self._dst = ImageTk.PhotoImage(file="./tmp.png")
+        self._dst = ImageTk.PhotoImage(file="./.tmp.png")
         self.img_area.create_image(self.img_width/2, self.img_height/2, image=self._dst)
 
     def read_json(self, j_file):
@@ -217,20 +228,35 @@ class Application(tk.Frame):
         im_new = self.add_margin(im, 0, 200, 200, 0, 'black')
         ax.imshow(im_new)
         fig.subplots_adjust(left=0, right=1, bottom=0.05, top=0.95)
-        fig.savefig('./tmp.png')
+        fig.savefig('./.tmp.png')
+
+    def create_save_dir(self):
+        os.makedirs(self.save_dir, exist_ok=True)
 
     def img_save_ex(self):
-        pass
+        shutil.copy2('./.tmp.png', self.save_dir+'/'+self.record.token+'.png')
+        print("Done copy as "+self.save_dir+'/'+self.record.token+'.png')
 
     def ann_export_ex(self):
-        pass
+        _dst = {}
+        if self.record.token in self.exported:
+            print("This record had already exported.")
+            return
+        self.exported.append(self.record.token)
+        _dst[self.record.token] = self.record.value
+        print(_dst)
+        with open(self.save_dir+'/checked_ann.json', mode='a') as f:
+            writer = ndjson.writer(f)
+            writer.writerow(_dst)
 
 
 def main():
+    _args = parse_args()
     root = tk.Tk()
-    app = Application(master=root, ann_json='ann_records/nuimages_ped_1017_v1.0-train.json', img_root='img_ped/nuimages_ped/v1.0-train/img')  # Inherit
+    app = Application(master=root, ann_json=_args.ann_json, img_root=_args.img_root, save_dir=_args.save_dir)  # Inherit
     app.mainloop()
 
 
 if __name__ == "__main__":
     main()
+    os.remove('./.tmp.png')
