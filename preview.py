@@ -11,6 +11,8 @@ import cv2
 import csv
 import json
 import ndjson
+import matplotlib.patches as patches
+import matplotlib.pyplot as plt
 
 
 class Application(tk.Frame):
@@ -96,6 +98,45 @@ def read_json(j_file):
     return _records
 
 
+def add_margin(pil_img, top, right, bottom, left, color):
+    width, height = pil_img.size
+    new_width = width + right + left
+    new_height = height + top + bottom
+    result = Image.new(pil_img.mode, (new_width, new_height), color)
+    result.paste(pil_img, (left, top))
+    return result
+
+
+def render_check_image(image_path: str, ped_bbox: list, ann_coords: list, ann_eyecontact: list, ann_difficult: list):
+    fig = plt.figure(figsize=(16, 9))
+    ax = fig.add_subplot(1, 1, 1)
+
+    bbox_wid = ped_bbox[2] - ped_bbox[0]
+    bbox_hei = ped_bbox[3] - ped_bbox[1]
+
+    for i in range(len(ann_coords)):
+        if ann_eyecontact[i] == 'true' or ann_difficult[i] == 'true':
+            c = 'gray'
+        else:
+            c = 'red'
+        x = ann_coords[i][0]
+        y = ann_coords[i][1]
+        ax.scatter(x, y, c=c, s=300)
+
+    ax.add_patch(patches.Rectangle(
+        xy=(ped_bbox[0], ped_bbox[1]),
+        width=bbox_wid,
+        height=bbox_hei,
+        edgecolor='yellow',
+        fill=False
+    ))
+
+    im = Image.open(image_path)
+    im_new = add_margin(im, 0, 200, 200, 0, 'black')
+    ax.imshow(im_new)
+    return fig
+
+
 def main():
     root = tk.Tk()
     app = Application(master=root)  # Inherit
@@ -104,6 +145,6 @@ def main():
 
 if __name__ == "__main__":
     # main()
-    rec = read_json('./ann_records/nuimages_ped_1017_v1.0-train.json')
-    for r in rec:
-        print(r[1]['std'])
+    dst = render_check_image('./img_ped/nuimages_ped/v1.0-train/img/a0c0b6717bb542b9b13727ff05253501.jpg',
+                             [49, 313, 140, 550], [[1731.9, 829.1], [1719.7, 531.3], [749.2, 526.1800000000001]], ['true', 'false', 'false'])
+    dst.savefig('./test.png')
