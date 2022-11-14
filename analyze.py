@@ -37,7 +37,8 @@ class JsonAnalyze:
             _look = d['look'].copy()
             _eyecontact = d['eyecontact']
             _difficult = d['difficult']
-            _look = self._check_eyecontact(_look, _eyecontact)
+            _look = self._check_label(_look, _eyecontact)
+            _look = self._check_label(_look, _difficult)
             _g = self._calc_barycenter(_look)  # tuple
             _dis = self._calc_distances(_g, _look)  # list
             _std = np.std(_dis)
@@ -64,9 +65,9 @@ class JsonAnalyze:
             _dis.append(np.linalg.norm(np.array(g)-np.array(coord)))
         return _dis
 
-    def _check_eyecontact(self, look: list, eyecontact: list) -> list:
-        for index, ec in enumerate(eyecontact):
-            if ec == 'true':
+    def _check_label(self, look: list, ann_label: list) -> list:
+        for index, an in enumerate(ann_label):
+            if an == 'true':
                 look[index] = [0, 0]
         return look
 
