@@ -25,6 +25,7 @@ class Cell:
     def __init__(self, value):
         self.token = value[0]
         self.value = value[1]
+        self.pos = 0
         self.next = None
         self.prev = None
 
@@ -32,9 +33,14 @@ class Cell:
 class DoublyLinkedList:
     def __init__(self):
         self.head = None
+        self.tail = None
+        self.len = 0
 
     def insert(self, value):
         new = Cell(value)
+        self.tail = new
+        self.len += 1
+        new.pos = self.len
         tmp = self.head
         if not tmp:
             new.next = new
@@ -113,6 +119,7 @@ class Application(tk.Frame):
         self.ann_canvas.create_text(5, 5, text="1 -> ", font=("Ricty", 24), anchor="nw", tag="ann1")
         self.ann_canvas.create_text(505, 5, text="2 -> ", font=("Ricty", 24), anchor="nw", tag="ann2")
         self.ann_canvas.create_text(1005, 5, text="3 -> ", font=("Ricty", 24), anchor="nw", tag="ann3")
+        self.ann_canvas.create_text(1505, 5, text="[x/x]", font=("Ricty", 24), anchor="nw", tag="progress")
         self.ann_canvas.create_text(5, 50, text="Image token: ", font=("Ricty", 20), anchor="nw", tag="imagetoken")
         self.ann_canvas.create_text(505, 50, text="Ped token: ", font=("Ricty", 20), anchor="nw", tag="pedtoken")
         self.ann_canvas.create_text(1005, 50, text="STDEV: ", font=("Ricty", 20), anchor="nw", tag="stdev")
@@ -146,6 +153,8 @@ class Application(tk.Frame):
         self.drawImage()
 
     def next_button_ex(self):
+        if self.record == self.records.tail and self.record.next == self.records.head:
+            print("END OF RECORD")
         self.record = self.record.next
         self.set_record()
 
@@ -174,9 +183,11 @@ class Application(tk.Frame):
         self.ann_canvas.delete("ann1")
         self.ann_canvas.delete("ann2")
         self.ann_canvas.delete("ann3")
+        self.ann_canvas.delete("progress")
         self.ann_canvas.create_text(5, 5, text="1 -> "+str(_ann[0]), font=("Ricty", 24), anchor="nw", tag="ann1")
         self.ann_canvas.create_text(505, 5, text="2 -> "+str(_ann[1]), font=("Ricty", 24), anchor="nw", tag="ann2")
         self.ann_canvas.create_text(1005, 5, text="3 -> "+str(_ann[2]), font=("Ricty", 24), anchor="nw", tag="ann3")
+        self.ann_canvas.create_text(1505, 5, text='['+str(self.record.pos)+'/'+str(self.records.len)+']', font=("Ricty", 24), anchor="nw", tag="progress")
 
     def drawImage(self):
         _img_path = self.img_root + '/' + self.imagetoken + '.jpg'
