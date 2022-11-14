@@ -196,8 +196,10 @@ class Application(tk.Frame):
         bbox_hei = ped_bbox[3] - ped_bbox[1]
 
         for i in range(len(ann_coords)):
-            if ann_eyecontact[i] == 'true' or ann_difficult[i] == 'true':
-                c = 'gray'
+            if ann_eyecontact[i] == 'true':
+                c = 'plum'
+            elif ann_difficult[i] == 'true':
+                c = 'purple'
             else:
                 c = 'red'
             x = ann_coords[i][0]
