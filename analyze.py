@@ -34,7 +34,7 @@ class JsonAnalyze:
         _records = {}
         for d in _data:
             _token = d['token'] + '@' + self.img_name
-            _look = d['look']
+            _look = d['look'].copy()
             _eyecontact = d['eyecontact']
             _difficult = d['difficult']
             _look = self._check_eyecontact(_look, _eyecontact)
@@ -45,7 +45,7 @@ class JsonAnalyze:
             _records[_token] = {
                 'std': _std,
                 'bbox': d['bbox'],
-                'look': _look,
+                'look': d['look'],  # eyecontactの計算上で0に書き換えているため，基の値を格納
                 'eyecontact': _eyecontact,
                 'difficult': _difficult,
                 'img_name': self.img_name,
