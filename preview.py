@@ -99,13 +99,18 @@ class Application(tk.Frame):
         self.img_save = ttk.Button(self.export_frame)
         self.img_save.configure(text='IMG Save')
         self.img_save.grid(column=0, row=0)
-        self.img_save.grid(pady=0)
+        self.img_save.grid(padx=20)
         self.img_save.configure(command=self.img_save_ex)
-        self.ann_export = ttk.Button(self.export_frame)
-        self.ann_export.configure(text='Ann Exp')
-        self.ann_export.grid(column=1, row=0)
-        self.ann_export.grid(pady=0)
-        self.ann_export.configure(command=self.ann_export_ex)
+        self.ann_good_export = ttk.Button(self.export_frame)
+        self.ann_good_export.configure(text='Ann Exp(Good)')
+        self.ann_good_export.grid(column=2, row=0)
+        self.ann_good_export.grid(pady=0)
+        self.ann_good_export.configure(command=self.ann_good_export_ex)
+        self.ann_bad_export = ttk.Button(self.export_frame)
+        self.ann_bad_export.configure(text='Ann Exp(Bad)')
+        self.ann_bad_export.grid(column=1, row=0)
+        self.ann_bad_export.grid(pady=0)
+        self.ann_bad_export.configure(command=self.ann_bad_export_ex)
 
         # ann frame
         self.ann_frame = ttk.LabelFrame(self)
@@ -113,13 +118,13 @@ class Application(tk.Frame):
         self.ann_frame.grid(padx=50, pady=0)
         # ann canvas
         self.ann_canvas = tk.Canvas(self.ann_frame)
-        self.ann_canvas.configure(width=1600, height=100, bg='snow')
+        self.ann_canvas.configure(width=self.img_width, height=100, bg='snow')
         self.ann_canvas.grid(column=0, row=0)
         self.ann_canvas.grid(padx=0, pady=0)
         self.ann_canvas.create_text(5, 5, text="1 -> ", font=("Ricty", 24), anchor="nw", tag="ann1")
         self.ann_canvas.create_text(505, 5, text="2 -> ", font=("Ricty", 24), anchor="nw", tag="ann2")
         self.ann_canvas.create_text(1005, 5, text="3 -> ", font=("Ricty", 24), anchor="nw", tag="ann3")
-        self.ann_canvas.create_text(1505, 5, text="[x/x]", font=("Ricty", 24), anchor="nw", tag="progress")
+        self.ann_canvas.create_text(1400, 5, text="[x/x]", font=("Ricty", 24), anchor="nw", tag="progress")
         self.ann_canvas.create_text(5, 50, text="Image token: ", font=("Ricty", 20), anchor="nw", tag="imagetoken")
         self.ann_canvas.create_text(505, 50, text="Ped token: ", font=("Ricty", 20), anchor="nw", tag="pedtoken")
         self.ann_canvas.create_text(1005, 50, text="STDEV: ", font=("Ricty", 20), anchor="nw", tag="stdev")
@@ -127,16 +132,24 @@ class Application(tk.Frame):
         self.control_frame = ttk.LabelFrame(self)
         self.control_frame.grid(column=0, row=2)
         self.control_frame.grid(padx=50, pady=10)
+        self.pos_input = ttk.Entry(self.control_frame, width=50)
+        self.pos_input.grid(column=0, row=0)
+        # load button
+        self.load_button = ttk.Button(self.control_frame)
+        self.load_button.configure(text='Load')
+        self.load_button.grid(column=1, row=0)
+        self.load_button.grid(padx=30)
+        self.load_button.configure(command=self.load_button_ex)
         # next button
         self.next_button = ttk.Button(self.control_frame)
         self.next_button.configure(text='Next')
-        self.next_button.grid(column=1, row=0)
+        self.next_button.grid(column=3, row=0)
         self.next_button.grid(pady=0)
         self.next_button.configure(command=self.next_button_ex)
         # preview button
         self.pre_button = ttk.Button(self.control_frame)
         self.pre_button.configure(text='Pre')
-        self.pre_button.grid(column=0, row=0)
+        self.pre_button.grid(column=2, row=0)
         self.pre_button.grid(pady=0)
         self.pre_button.configure(command=self.pre_button_ex)
 
@@ -151,6 +164,12 @@ class Application(tk.Frame):
         self.update_info_area()
         self.update_ann_area()
         self.drawImage()
+
+    def load_button_ex(self):
+        _pos = self.pos_input.get()
+        while self.record.pos != int(_pos):
+            self.record = self.record.next
+        self.set_record()
 
     def next_button_ex(self):
         if self.record == self.records.tail and self.record.next == self.records.head:
@@ -187,7 +206,7 @@ class Application(tk.Frame):
         self.ann_canvas.create_text(5, 5, text="1 -> "+str(_ann[0]), font=("Ricty", 24), anchor="nw", tag="ann1")
         self.ann_canvas.create_text(505, 5, text="2 -> "+str(_ann[1]), font=("Ricty", 24), anchor="nw", tag="ann2")
         self.ann_canvas.create_text(1005, 5, text="3 -> "+str(_ann[2]), font=("Ricty", 24), anchor="nw", tag="ann3")
-        self.ann_canvas.create_text(1505, 5, text='['+str(self.record.pos)+'/'+str(self.records.len)+']', font=("Ricty", 24), anchor="nw", tag="progress")
+        self.ann_canvas.create_text(1400, 5, text='['+str(self.record.pos)+'/'+str(self.records.len)+']', font=("Ricty", 24), anchor="nw", tag="progress")
 
     def drawImage(self):
         _img_path = self.img_root + '/' + self.imagetoken + '.jpg'
@@ -248,7 +267,7 @@ class Application(tk.Frame):
         shutil.copy2('./.tmp.png', self.save_dir+'/'+self.record.token+'.png')
         print("Done copy as "+self.save_dir+'/'+self.record.token+'.png')
 
-    def ann_export_ex(self):
+    def ann_good_export_ex(self):
         _dst = {}
         if self.record.token in self.exported:
             print("This record had already exported.")
@@ -256,7 +275,19 @@ class Application(tk.Frame):
         self.exported.append(self.record.token)
         _dst[self.record.token] = self.record.value
         print(_dst)
-        with open(self.save_dir+'/checked_ann.json', mode='a') as f:
+        with open(self.save_dir+'/checked_ann_good.json', mode='a') as f:
+            writer = ndjson.writer(f)
+            writer.writerow(_dst)
+
+    def ann_bad_export_ex(self):
+        _dst = {}
+        if self.record.token in self.exported:
+            print("This record had already exported.")
+            return
+        self.exported.append(self.record.token)
+        _dst[self.record.token] = self.record.value
+        print(_dst)
+        with open(self.save_dir+'/checked_ann_bad.json', mode='a') as f:
             writer = ndjson.writer(f)
             writer.writerow(_dst)
 
