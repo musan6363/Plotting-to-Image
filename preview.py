@@ -168,9 +168,33 @@ class Application(tk.Frame):
         self.drawImage()
 
     def load_button_ex(self):
-        _pos = self.pos_input.get()
-        while self.record.pos != int(_pos):
+        _input = self.pos_input.get()
+        if self.is_int(_input):
+            self.search_record_by_pos(_input)
+        else:
+            self.search_record_by_pedtoken(_input)
+
+    def is_int(self, input) -> bool:
+        try:
+            int(input)
+        except ValueError:
+            return False
+        return True
+
+    def search_record_by_pos(self, pos):
+        pos = int(pos)
+        if pos > self.records.len:
+            raise IndexError("Out of records!")
+        while self.record.pos != pos:
             self.record = self.record.next
+        self.set_record()
+
+    def search_record_by_pedtoken(self, token):
+        _search_start = self.record
+        while self.record.value['ped_token'] != token:
+            self.record = self.record.next
+            if self.record == _search_start:
+                raise IndexError("ped token {"+token+"} is not found.")
         self.set_record()
 
     def next_button_ex(self):
