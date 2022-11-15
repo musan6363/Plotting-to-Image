@@ -64,6 +64,8 @@ class Application(tk.Frame):
         self.master.title("Annotation Preview")
         self.img_width = 1600
         self.img_height = 900
+        self.img_x_shift = 100
+        self.img_y_shift = 100
 
         self.save_dir = save_dir
         self.create_save_dir()
@@ -248,14 +250,14 @@ class Application(tk.Frame):
             ax.scatter(x, y, c=c, s=300)
 
         ax.add_patch(patches.Rectangle(
-            xy=(ped_bbox[0], ped_bbox[1]),
+            xy=(ped_bbox[0]+self.img_x_shift, ped_bbox[1]+self.img_y_shift),
             width=bbox_wid,
             height=bbox_hei,
             edgecolor='yellow',
             fill=False
         ))
 
-        im_new = self.add_margin(im, 0, 200, 200, 0, 'black')
+        im_new = self.add_margin(im, self.img_y_shift, self.img_x_shift, self.img_y_shift, self.img_x_shift, 'black')
         ax.imshow(im_new)
         fig.subplots_adjust(left=0, right=1, bottom=0.05, top=0.95)
         fig.savefig('./.tmp.png')
