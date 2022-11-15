@@ -3,6 +3,7 @@ ann*
 img_ped/
 test*
 output/
+*tmp*
 
 ### Pre defined
 # Byte-compiled / optimized / DLL files
