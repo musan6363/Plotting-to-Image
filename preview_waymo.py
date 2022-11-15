@@ -272,7 +272,7 @@ class Application(tk.Frame):
                 c = 'red'
             x = ann_coords[i][0]
             y = ann_coords[i][1]
-            ax.scatter(x, y, c=c, s=300)
+            ax.scatter(x, y, c=c, s=300, alpha=0.3)
 
         ax.add_patch(patches.Rectangle(
             xy=(ped_bbox[0]+self.img_x_shift, ped_bbox[1]+self.img_y_shift),
