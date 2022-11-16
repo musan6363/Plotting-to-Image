@@ -61,7 +61,7 @@ class Application(tk.Frame):
         self.pack()
 
         self.master.geometry("2000x1500")
-        self.master.title("Annotation Preview")
+        self.master.title(os.path.basename(ann_json))
         self.img_width = 1600
         self.img_height = 900
         self.img_x_shift = 100
