@@ -41,10 +41,10 @@ class JsonAnalyze:
             _look = self._check_label(_look, _difficult)
             _g = self._calc_barycenter(_look)  # tuple
             _dis = self._calc_distances(_g, _look)  # list
-            _std = np.std(_dis)
+            _sum = np.sum(_dis)
 
             _records[_token] = {
-                'std': _std,
+                'sum': _sum,
                 'bbox': d['bbox'],
                 'look': d['look'],  # eyecontactの計算上で0に書き換えているため，基の値を格納
                 'eyecontact': _eyecontact,

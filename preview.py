@@ -61,7 +61,8 @@ class Application(tk.Frame):
         self.pack()
 
         self.master.geometry("2000x1500")
-        self.master.title("Annotation Preview")
+        self.master.title(os.path.basename(ann_json))
+        self.master.configure(bg='black')
         self.img_width = 1600
         self.img_height = 900
         self.img_x_shift = 100
@@ -129,7 +130,7 @@ class Application(tk.Frame):
         self.ann_canvas.create_text(1400, 5, text="[x/x]", font=("Ricty", 24), anchor="nw", tag="progress")
         self.ann_canvas.create_text(5, 50, text="Image token: ", font=("Ricty", 20), anchor="nw", tag="imagetoken")
         self.ann_canvas.create_text(505, 50, text="Ped token: ", font=("Ricty", 20), anchor="nw", tag="pedtoken")
-        self.ann_canvas.create_text(1005, 50, text="STDEV: ", font=("Ricty", 20), anchor="nw", tag="stdev")
+        self.ann_canvas.create_text(1005, 50, text="SUM: ", font=("Ricty", 20), anchor="nw", tag="sum")
         # info frame
         self.control_frame = ttk.LabelFrame(self)
         self.control_frame.grid(column=0, row=2)
@@ -159,7 +160,7 @@ class Application(tk.Frame):
     def set_record(self):
         self.imagetoken = self.record.value['img_name']
         self.pedtoken = self.record.value['ped_token']
-        self.stdev = self.record.value['std']
+        self.sum = self.record.value['sum']
         self.ann_coords = self.record.value['look']
         self.ann_eyecontacts = self.record.value['eyecontact']
         self.ann_difficult = self.record.value['difficult']
@@ -210,10 +211,10 @@ class Application(tk.Frame):
     def update_info_area(self):
         self.ann_canvas.delete("imagetoken")
         self.ann_canvas.delete("pedtoken")
-        self.ann_canvas.delete("stdev")
+        self.ann_canvas.delete("sum")
         self.ann_canvas.create_text(5, 50, text="Image token: "+self.imagetoken, font=("Ricty", 20), anchor="nw", tag="imagetoken")
         self.ann_canvas.create_text(505, 50, text="Ped token: "+self.pedtoken, font=("Ricty", 20), anchor="nw", tag="pedtoken")
-        self.ann_canvas.create_text(1005, 50, text="STDEV: "+str(self.stdev), font=("Ricty", 20), anchor="nw", tag="stdev")
+        self.ann_canvas.create_text(1005, 50, text="SUM: "+str(self.sum), font=("Ricty", 20), anchor="nw", tag="sum")
 
     def update_ann_area(self):
         _ann = [None, None, None]
@@ -243,7 +244,7 @@ class Application(tk.Frame):
     def read_json(self, j_file):
         with open(j_file, 'r') as f:
             _records = json.load(f)
-        _records = sorted(_records.items(), key=lambda r: r[1]['std'], reverse=True)
+        _records = sorted(_records.items(), key=lambda r: r[1]['sum'], reverse=True)
         return _records
 
     def add_margin(self, pil_img, top, right, bottom, left, color):
