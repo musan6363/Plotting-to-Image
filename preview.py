@@ -62,6 +62,7 @@ class Application(tk.Frame):
 
         self.master.geometry("2000x1500")
         self.master.title(os.path.basename(ann_json))
+        self.master.configure(bg='black')
         self.img_width = 1600
         self.img_height = 900
         self.img_x_shift = 100
