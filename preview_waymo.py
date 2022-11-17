@@ -161,7 +161,7 @@ class Application(tk.Frame):
     def set_record(self):
         self.imagetoken = self.record.value['img_name']
         self.pedtoken = self.record.value['ped_token']
-        self.stdev = self.record.value['sum']
+        self.sum = self.record.value['sum']
         self.ann_coords = self.record.value['look']
         self.ann_eyecontacts = self.record.value['eyecontact']
         self.ann_difficult = self.record.value['difficult']
@@ -239,8 +239,8 @@ class Application(tk.Frame):
     def drawImage(self):
         _img_path = self.img_root + '/' + self.imagetoken + '.png'
         self.render_check_image(_img_path, self.record.value['bbox'], self.ann_coords, self.ann_eyecontacts, self.ann_difficult)
-        self._dst = ImageTk.PhotoImage(file="./.tmp.png")
-        self.img_area.create_image(self.img_width/2, self.img_height/2, image=self._dst)
+        self._sum = ImageTk.PhotoImage(file="./.tmp.png")
+        self.img_area.create_image(self.img_width/2, self.img_height/2, image=self._sum)
 
     def read_json(self, j_file):
         with open(j_file, 'r') as f:
@@ -296,28 +296,28 @@ class Application(tk.Frame):
         print("Done copy as "+self.save_dir+'/'+self.record.token+'.png')
 
     def ann_good_export_ex(self):
-        _dst = {}
+        _sum = {}
         if self.record.token in self.exported:
             print("This record had already exported.")
             return
         self.exported.append(self.record.token)
-        _dst[self.record.token] = self.record.value
-        print(_dst)
+        _sum[self.record.token] = self.record.value
+        print(_sum)
         with open(self.save_dir+'/checked_ann_good.json', mode='a') as f:
             writer = ndjson.writer(f)
-            writer.writerow(_dst)
+            writer.writerow(_sum)
 
     def ann_bad_export_ex(self):
-        _dst = {}
+        _sum = {}
         if self.record.token in self.exported:
             print("This record had already exported.")
             return
         self.exported.append(self.record.token)
-        _dst[self.record.token] = self.record.value
-        print(_dst)
+        _sum[self.record.token] = self.record.value
+        print(_sum)
         with open(self.save_dir+'/checked_ann_bad.json', mode='a') as f:
             writer = ndjson.writer(f)
-            writer.writerow(_dst)
+            writer.writerow(_sum)
 
 
 def main():
