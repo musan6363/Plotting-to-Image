@@ -99,22 +99,33 @@ class Application(tk.Frame):
         self.export_frame = ttk.LabelFrame(self)
         self.export_frame.grid(column=0, row=3)
         self.export_frame.grid(padx=50, pady=10)
+        # memo box
+        self.memo_input = ttk.Entry(self.export_frame, width=50)
+        self.memo_input.grid(column=0, row=0)
         # Save Button
         self.img_save = ttk.Button(self.export_frame)
         self.img_save.configure(text='IMG Save')
-        self.img_save.grid(column=0, row=0)
+        self.img_save.grid(column=1, row=0)
         self.img_save.grid(padx=20)
         self.img_save.configure(command=self.img_save_ex)
+        # Re do because bad annotation
+        self.ann_re_do_export = ttk.Button(self.export_frame)
+        self.ann_re_do_export.configure(text='Ann Exp(RE DO)')
+        self.ann_re_do_export.grid(column=2, row=0)
+        self.ann_re_do_export.grid(pady=0)
+        self.ann_re_do_export.configure(command=self.ann_re_do_export_ex)
+        # NOT USE Export ex)occlusion
+        self.ann_not_use_export = ttk.Button(self.export_frame)
+        self.ann_not_use_export.configure(text='Ann Exp(NOT USE)')
+        self.ann_not_use_export.grid(column=3, row=0)
+        self.ann_not_use_export.grid(pady=0)
+        self.ann_not_use_export.configure(command=self.ann_not_use_export_ex)
+        # Good Export
         self.ann_good_export = ttk.Button(self.export_frame)
         self.ann_good_export.configure(text='Ann Exp(Good)')
-        self.ann_good_export.grid(column=2, row=0)
-        self.ann_good_export.grid(pady=0)
+        self.ann_good_export.grid(column=4, row=0)
+        self.ann_good_export.grid(padx=10)
         self.ann_good_export.configure(command=self.ann_good_export_ex)
-        self.ann_bad_export = ttk.Button(self.export_frame)
-        self.ann_bad_export.configure(text='Ann Exp(Bad)')
-        self.ann_bad_export.grid(column=1, row=0)
-        self.ann_bad_export.grid(pady=0)
-        self.ann_bad_export.configure(command=self.ann_bad_export_ex)
 
         # ann frame
         self.ann_frame = ttk.LabelFrame(self)
@@ -136,6 +147,7 @@ class Application(tk.Frame):
         self.control_frame = ttk.LabelFrame(self)
         self.control_frame.grid(column=0, row=2)
         self.control_frame.grid(padx=50, pady=10)
+        # Search Box
         self.pos_input = ttk.Entry(self.control_frame, width=50)
         self.pos_input.grid(column=0, row=0)
         # load button
@@ -296,28 +308,30 @@ class Application(tk.Frame):
         print("Done copy as "+self.save_dir+'/'+self.record.token+'.png')
 
     def ann_good_export_ex(self):
-        _sum = {}
-        if self.record.token in self.exported:
-            print("This record had already exported.")
-            return
-        self.exported.append(self.record.token)
-        _sum[self.record.token] = self.record.value
-        print(_sum)
-        with open(self.save_dir+'/checked_ann_good.json', mode='a') as f:
-            writer = ndjson.writer(f)
-            writer.writerow(_sum)
+        self.export_json(self.save_dir+'/checked_ann_good.json')
 
-    def ann_bad_export_ex(self):
-        _sum = {}
+    def ann_not_use_export_ex(self):
+        self.export_json(self.save_dir+'/checked_ann_not_use.json')
+
+    def ann_re_do_export_ex(self):
+        self.export_json(self.save_dir+'/checked_ann_re_do.json')
+
+    def export_json(self, path: str):
+        _dst = {}
         if self.record.token in self.exported:
             print("This record had already exported.")
             return
         self.exported.append(self.record.token)
-        _sum[self.record.token] = self.record.value
-        print(_sum)
-        with open(self.save_dir+'/checked_ann_bad.json', mode='a') as f:
-            writer = ndjson.writer(f)
-            writer.writerow(_sum)
+        _input = self.memo_input.get()
+        _dst[self.record.token] = self.record.value
+        _dst[self.record.token]['memo'] = _input
+        self.memo_input.delete(0, tk.END)
+        print(_dst)
+        with open(path, mode='a') as f:
+            writer = ndjson.writer(f, ensure_ascii=False)
+            writer.writerow(_dst)
+        self.img_save_ex()
+        self.next_button_ex()
 
 
 def main():
