@@ -307,9 +307,10 @@ class Application(tk.Frame):
 
     def create_save_dir(self):
         os.makedirs(self.save_dir, exist_ok=True)
+        os.makedirs(self.save_dir + '/img', exist_ok=True)
 
     def img_save_ex(self):
-        shutil.copy2('./.tmp.png', self.save_dir+'/'+self.record.token+'.png')
+        shutil.copy2('./.tmp.png', self.save_dir+'/img/'+self.record.token+'.png')
         print("Done copy as "+self.save_dir+'/'+self.record.token+'.png')
 
     def ann_good_export_ex(self):
