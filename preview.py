@@ -326,7 +326,7 @@ class Application(tk.Frame):
         _dst = {}
         if self.record.token in self.exported:
             print("This record had already exported.")
-            return
+            # return
         self.exported.append(self.record.token)
         _input = self.memo_input.get()
         _dst[self.record.token] = self.record.value
