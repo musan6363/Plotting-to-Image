@@ -143,6 +143,10 @@ class Application(tk.Frame):
         self.ann_canvas.create_text(5, 50, text="Image token: ", font=("Ricty", 20), anchor="nw", tag="imagetoken")
         self.ann_canvas.create_text(805, 50, text="Ped token: ", font=("Ricty", 20), anchor="nw", tag="pedtoken")
         self.ann_canvas.create_text(1405, 50, text="SUM: ", font=("Ricty", 20), anchor="nw", tag="sum")
+        # frame key box for copying to clipboard
+        self.frame_key_box = ttk.Entry(self.ann_frame, width=50)
+        self.frame_key_box.grid(column=0, row=1)
+
         # info frame
         self.control_frame = ttk.LabelFrame(self)
         self.control_frame.grid(column=0, row=2)
@@ -228,6 +232,7 @@ class Application(tk.Frame):
         self.ann_canvas.create_text(5, 50, text="Image token: "+self.imagetoken, font=("Ricty", 20), anchor="nw", tag="imagetoken")
         self.ann_canvas.create_text(805, 50, text="Ped token: "+self.pedtoken, font=("Ricty", 20), anchor="nw", tag="pedtoken")
         self.ann_canvas.create_text(1405, 50, text="SUM: "+str(self.sum), font=("Ricty", 20), anchor="nw", tag="sum")
+        self.frame_key_box.insert(0, self.record.token)
 
     def update_ann_area(self):
         _ann = [None, None, None]
@@ -302,9 +307,10 @@ class Application(tk.Frame):
 
     def create_save_dir(self):
         os.makedirs(self.save_dir, exist_ok=True)
+        os.makedirs(self.save_dir + '/img', exist_ok=True)
 
     def img_save_ex(self):
-        shutil.copy2('./.tmp.png', self.save_dir+'/'+self.record.token+'.png')
+        shutil.copy2('./.tmp.png', self.save_dir+'/img/'+self.record.token+'.png')
         print("Done copy as "+self.save_dir+'/'+self.record.token+'.png')
 
     def ann_good_export_ex(self):
@@ -320,7 +326,7 @@ class Application(tk.Frame):
         _dst = {}
         if self.record.token in self.exported:
             print("This record had already exported.")
-            return
+            # return
         self.exported.append(self.record.token)
         _input = self.memo_input.get()
         _dst[self.record.token] = self.record.value
