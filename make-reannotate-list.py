@@ -76,5 +76,12 @@ class MakeReannotateList:
 
 
 if __name__ == "__main__":
-    mrl = MakeReannotateList('nuimages_ped', 'v1.0-train')
-    mrl.main()
+    targets = [
+        ('nuimages_ped', 'v1.0-train'), 
+        ('nuimages_ped', 'v1.0-val'), 
+        ('waymo_ped', 'train'), 
+        ('waymo_ped', 'validation')
+    ]
+    for target in targets:
+        mrl = MakeReannotateList(target[0], target[1])
+        mrl.main()
