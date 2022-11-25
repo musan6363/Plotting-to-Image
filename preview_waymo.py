@@ -229,6 +229,7 @@ class Application(tk.Frame):
         self.ann_canvas.delete("imagetoken")
         self.ann_canvas.delete("pedtoken")
         self.ann_canvas.delete("sum")
+        self.frame_key_box.delete(0, tk.END)
         self.ann_canvas.create_text(5, 50, text="Image token: "+self.imagetoken, font=("Ricty", 20), anchor="nw", tag="imagetoken")
         self.ann_canvas.create_text(805, 50, text="Ped token: "+self.pedtoken, font=("Ricty", 20), anchor="nw", tag="pedtoken")
         self.ann_canvas.create_text(1405, 50, text="SUM: "+str(self.sum), font=("Ricty", 20), anchor="nw", tag="sum")
