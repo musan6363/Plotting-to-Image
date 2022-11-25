@@ -89,8 +89,6 @@ class MakeReannotateList:
         self.make_list()
         self.make_notuse_list()
         self.export()
-        print(self.reannotate_list, end='\n\n')
-        print(self.recheck_dict)
 
 
 if __name__ == "__main__":
@@ -101,5 +99,6 @@ if __name__ == "__main__":
         ('waymo_ped', 'validation')
     ]
     for target in targets:
+        print(target)
         mrl = MakeReannotateList(target[0], target[1])
         mrl.main()
