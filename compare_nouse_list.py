@@ -34,13 +34,36 @@ class NoUseDict:
             print("  },")
         print("}")
 
-def copy_no_use_dict(original: NoUseDict) -> NoUseDict:
+def copy_nud_frame(original: NoUseDict) -> NoUseDict:
     new_d = NoUseDict()
     for dataset_name, version_dict in original.d.items():
         for version_name in version_dict.keys():
             new_d.add_frame(dataset_name, version_name)
     return new_d
 
+def compare_nud_frame(nud1: NoUseDict, nud2: NoUseDict) -> tuple:
+    unique1 = []
+    unique2 = []
+    for dataset_name, version_dict in nud1.d.items():
+        for version_name, img_dict in version_dict.items():
+            for img_name, ped_tokens in img_dict.items():
+                for ped_token in ped_tokens:
+                    if img_name not in nud2.d[dataset_name][version_name]:
+                        unique1.append((dataset_name, version_name, img_name, ped_token))
+                    elif ped_token not in nud2.d[dataset_name][version_name][img_name]:
+                        unique1.append((dataset_name, version_name, img_name, ped_token))
+    for dataset_name, version_dict in nud2.d.items():
+        for version_name, img_dict in version_dict.items():
+            if version_name not in nud1.d:
+                continue
+            for img_name, ped_tokens in img_dict.items():
+                for ped_token in ped_tokens:
+                    if img_name not in nud1.d[dataset_name][version_name]:
+                        unique2.append((dataset_name, version_name, img_name, ped_token))
+                    elif ped_token not in nud1.d[dataset_name][version_name][img_name]:
+                        unique2.append((dataset_name, version_name, img_name, ped_token))
+    return unique1, unique2
+                        
 
 def load_json(file_name: str) -> list:
     with open(file_name, 'r') as f:
@@ -89,10 +112,14 @@ us = analyze_us_records(us, "reannotate/nuimages_ped_1017/v1.0-train/notuse.json
 us = analyze_us_records(us, "reannotate/nuimages_ped_1017/v1.0-val/notuse.json")
 us = analyze_us_records(us, "reannotate/waymo-ped/train/notuse.json")
 us = analyze_us_records(us, "reannotate/waymo-ped/validation/notuse.json")
-us.show()
+# us.show()
 
 gw = NoUseDict()
-gw = copy_no_use_dict(us)
+gw = copy_nud_frame(us)
 gw.add_frame('nuscenes_ped', 'v1.0-trainval')
 gw = analyze_gw_records(gw, "ann/no_annotation_list.json")
-gw.show()
+# gw.show()
+
+unique1, unique2 = compare_nud_frame(us, gw)
+print("unique1 : ", len(unique1))
+print("unique2 : ", len(unique2))
