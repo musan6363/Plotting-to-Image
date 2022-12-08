@@ -33,15 +33,22 @@ class JsonAnalyze:
 
         _records = {}
         for d in _data:
-            _token = d['token'] + '@' + self.img_name
-            _look = d['look'].copy()
-            _eyecontact = d['eyecontact']
-            _difficult = d['difficult']
-            _look = self._check_label(_look, _eyecontact)
-            _look = self._check_label(_look, _difficult)
-            _g = self._calc_barycenter(_look)  # tuple
-            _dis = self._calc_distances(_g, _look)  # list
-            _sum = np.sum(_dis)
+            try:
+                _token = d['token'] + '@' + self.img_name
+                _look = d['look'].copy()
+                self._check_look_over_zero(_look)
+                _eyecontact = d['eyecontact']
+                _difficult = d['difficult']
+                _look = self._check_label(_look, _eyecontact)
+                _look = self._check_label(_look, _difficult)
+                _g = self._calc_barycenter(_look)  # tuple
+                _dis = self._calc_distances(_g, _look)  # list
+                _sum = np.sum(_dis)
+            except Exception as e:
+                print(e)
+                print(osp.basename(self.json_path))
+                print(d)
+                continue
 
             _records[_token] = {
                 'sum': _sum,
@@ -53,6 +60,11 @@ class JsonAnalyze:
                 'ped_token': d['token']
             }
         return _records
+
+    def _check_look_over_zero(self, coords: list) -> None:
+        for coord in coords:
+            if coord[0] <= 0 or coord[1] <= 0:
+                print(self.json_path, self.img_name)
 
     def _calc_barycenter(self, coords: list) -> tuple:
         _gx = (coords[0][0]+coords[1][0]+coords[2][0])/3
