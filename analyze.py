@@ -11,6 +11,7 @@ import os
 import numpy as np
 from glob import glob
 from tqdm import tqdm
+import sys
 
 
 def parse_args():
@@ -35,15 +36,21 @@ class JsonAnalyze:
 
         _records = {}
         for d in _data:
-            _token = d['token'] + '@' + self.img_name
-            _look = d['look'].copy()
-            _eyecontact = d['eyecontact']
-            _difficult = d['difficult']
-            _look = self._check_label(_look, _eyecontact)
-            _look = self._check_label(_look, _difficult)
-            _g = self._calc_barycenter(_look)  # tuple
-            _dis = self._calc_distances(_g, _look)  # list
-            _sum = np.sum(_dis)
+            try:
+                _token = d['token'] + '@' + self.img_name
+                _look = d['look'].copy()
+                _eyecontact = d['eyecontact']
+                _difficult = d['difficult']
+                _look = self._check_label(_look, _eyecontact)
+                _look = self._check_label(_look, _difficult)
+                _g = self._calc_barycenter(_look)  # tuple
+                _dis = self._calc_distances(_g, _look)  # list
+                _sum = np.sum(_dis)
+            except Exception as e:
+                print(e)
+                print(osp.basename(self.json_path))
+                print(d)
+                continue
 
             _records[_token] = {
                 'sum': _sum,
