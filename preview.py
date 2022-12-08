@@ -208,7 +208,7 @@ class Application(tk.Frame):
 
     def search_record_by_pedtoken(self, token):
         _search_start = self.record
-        while self.record.value['ped_token'] != token:
+        while self.record.token != token:
             self.record = self.record.next
             if self.record == _search_start:
                 raise IndexError("ped token {"+token+"} is not found.")
