@@ -208,7 +208,7 @@ class Application(tk.Frame):
 
     def search_record_by_pedtoken(self, token):
         _search_start = self.record
-        while self.record.value['ped_token'] != token:
+        while self.record.token != token:
             self.record = self.record.next
             if self.record == _search_start:
                 raise IndexError("ped token {"+token+"} is not found.")
@@ -288,8 +288,8 @@ class Application(tk.Frame):
                 c = 'purple'
             else:
                 c = 'red'
-            x = ann_coords[i][0]
-            y = ann_coords[i][1]
+            x = ann_coords[i][0] + self.img_x_shift
+            y = ann_coords[i][1] + self.img_y_shift
             ax.scatter(x, y, c=c, s=300, alpha=0.3)
 
         ax.add_patch(patches.Rectangle(

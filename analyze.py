@@ -39,6 +39,7 @@ class JsonAnalyze:
             try:
                 _token = d['token'] + '@' + self.img_name
                 _look = d['look'].copy()
+                self._check_look_over_zero(_look)
                 _eyecontact = d['eyecontact']
                 _difficult = d['difficult']
                 _look = self._check_label(_look, _eyecontact)
@@ -62,6 +63,11 @@ class JsonAnalyze:
                 'ped_token': d['token']
             }
         return _records
+
+    def _check_look_over_zero(self, coords: list) -> None:
+        for coord in coords:
+            if coord[0] <= 0 or coord[1] <= 0:
+                print(self.json_path, self.img_name)
 
     def _calc_barycenter(self, coords: list) -> tuple:
         _gx = (coords[0][0]+coords[1][0]+coords[2][0])/3
