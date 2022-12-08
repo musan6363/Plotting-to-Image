@@ -47,6 +47,7 @@ class JsonAnalyze:
                 print(e)
                 print(osp.basename(self.json_path))
                 print(d)
+                continue
 
             _records[_token] = {
                 'sum': _sum,
