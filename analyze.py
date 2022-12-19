@@ -42,6 +42,7 @@ class JsonAnalyze:
                 self._check_look_over_zero(_look)
                 _eyecontact = d['eyecontact']
                 _difficult = d['difficult']
+                _look, _eyecontact, _difficult = self._is_not_annotated(_look, _eyecontact, _difficult)
                 _look = self._check_label(_look, _eyecontact)
                 _look = self._check_label(_look, _difficult)
                 _g = self._calc_barycenter(_look)  # tuple
@@ -86,6 +87,14 @@ class JsonAnalyze:
                 look[index] = [0, 0]
         return look
 
+    def _is_not_annotated(self, _look: list, _eyecontact: list, _difficult: list) -> tuple:
+        for index, an in enumerate(_difficult):
+            if an == '':
+                _look[index] = [0, 0]
+                _eyecontact[index] = 'false'
+                _difficult[index] = 'false'
+        return _look, _eyecontact, _difficult
+
 
 def main():
     _args = parse_args()
@@ -96,7 +105,7 @@ def main():
         ja = JsonAnalyze(j)
         _ann_datas.update(ja.read_records())
 
-    os.makedirs(_args.save_dir)    
+    os.makedirs(_args.save_dir)
     with open(_args.save_dir + '/' + _args.save_name + '.json', 'w') as f:
         json.dump(_ann_datas, f, indent=2)
 
