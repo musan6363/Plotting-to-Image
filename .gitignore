@@ -6,6 +6,9 @@ output/
 *tmp*
 run.sh
 reannotate/
+output_1219/
+output1222/
+not-use/
 
 ### Pre defined
 # Byte-compiled / optimized / DLL files
